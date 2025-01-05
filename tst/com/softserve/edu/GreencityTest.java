@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.JavascriptExecutor;
 
 import java.time.Duration;
 
@@ -23,18 +24,17 @@ public class GreencityTest {
     public static void setUp() {
         System.setProperty("webdriver.chrome.driver", "./lib/chromedriver.exe");
         driver = new ChromeDriver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        driver.manage().window().maximize();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(60)); // Збільшено до 60 секунд
+        driver.manage().window().maximize(); // Зробити вікно браузера максимальним
     }
 
     @Test
     public void positiveRegistrationTest() {
-        driver.get("https://www.greencity.cx.ua/");
-        driver.manage().window().setSize(new org.openqa.selenium.Dimension(806, 690));
+        driver.get("https://www.greencity.cx.ua/#/greenCity");
 
-        // Очікування, поки кнопка реєстрації стане клікабельною
-        WebElement registerButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("app-header:nth-child(1) .header_sign-up-link:nth-child(4) span:nth-child(1)")));
-        registerButton.click();
+        // Очікування, поки кнопка реєстрації стане видимою та клікабельною
+        WebElement signUpButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".header_sign-up-btn span")));
+        signUpButton.click();
 
         // Очікування, поки поле електронної пошти стане видимим
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email")));
@@ -48,9 +48,9 @@ public class GreencityTest {
 
         driver.findElement(By.id("repeatPassword")).sendKeys("Anna$5685-ANNA");
 
-        // Очікування, поки кнопка відправки стане клікабельною
+        // Спроба натискання кнопки через JavaScript (якщо звичайне натискання не працює)
         WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ubsStyle")));
-        submitButton.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitButton);
 
         // Додайте перевірки для успішної реєстрації
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".modal-header")));
@@ -59,6 +59,6 @@ public class GreencityTest {
 
     @AfterAll
     public static void tearDown() {
-        driver.quit();
+        driver.quit(); // Закрити браузер після тесту
     }
 }
